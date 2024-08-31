@@ -1,7 +1,10 @@
+import Rooms from "@/components/Rooms";
 
 const Home = () => {
   return (
-        <main>homepage</main>
+      <main>
+        <Rooms />
+      </main>
   );
 }
 
