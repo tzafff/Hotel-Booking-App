@@ -2,6 +2,10 @@ import type { Metadata } from "next";
 import { Marcellus, Urbanist } from "next/font/google";
 import "./globals.css";
 
+// @components
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+
 const marcellus = Marcellus(
     { subsets: ["latin"],
       weight: ["400"],
@@ -27,7 +31,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${marcellus.variable} ${ubanist.variable}`}>{children}</body>
+      <body className={`${marcellus.variable} ${ubanist.variable}`}>
+      <Header />
+      {children}
+      <Footer />
+      </body>
     </html>
   );
 }
