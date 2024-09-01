@@ -46,7 +46,7 @@ const Reservation = ({
     isUserAuthenticated: boolean;
     userData: any;
 }) => {
-    console.log(room)
+    //console.log(room)
 
     const [checkInDate, setCheckInDate] = React.useState<Date>()
     const [checkOutDate, setCheckOutDate] = React.useState<Date>()
