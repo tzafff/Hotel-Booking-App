@@ -16,6 +16,9 @@ const config: Config = {
 			"2xl": "1400px",
 		}
 	},
+  	backgroundImage: {
+		hero: 'url("/assets/hero/bg.jpg")'
+	},
 	fontFamily:	{
 		primary: "var(--font-marcellus)",
 		secondary: "var(--font-urbanist)"
