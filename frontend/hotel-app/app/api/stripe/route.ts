@@ -30,8 +30,6 @@ export async function POST(req: Request, res: Response) {
         checkOut,
     }: RequestData = await req.json();
     debugger
-    console.log("TEST2");
-    console.log("Room ID:", room.data.id);
 
 
     const roomId = room.data.id;
@@ -43,8 +41,6 @@ export async function POST(req: Request, res: Response) {
     if (!getUser) {
         return new NextResponse('Authentication required', { status: 400 });
     }
-
-    const userId = user.id;
 
     try {
         const imageUrl = `${origin}${room.data.attributes.image.data?.attributes.url}`;

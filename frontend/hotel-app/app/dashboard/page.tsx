@@ -69,7 +69,7 @@ const Dashboard = async () => {
                                                 </div>
                                             </div>
 
-                                            <CancelReservation reservation={reservation}/>
+                                            {/*<CancelReservation reservation={reservation}/>*/}
                                         </div>
                                     </div>
                                 )
