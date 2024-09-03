@@ -3,7 +3,7 @@
 import React, {useState, useEffect} from "react";
 import {Button} from './ui/button'
 import { Calendar } from './ui/calendar'
-import { format, isPast } from "date-fns"
+import { format, isPast, isWithinInterval, addDays } from "date-fns"
 import { cn } from "@/lib/utils"
 import { Calendar as CalendarIcon } from "lucide-react"
 import {
@@ -15,25 +15,9 @@ import {
 import {LoginLink} from "@kinde-oss/kinde-auth-nextjs/components";
 import AlertMessage from "@/components/AlertMessage";
 import {useRouter} from 'next/navigation'
-
-const postData = async (url: string, data: object) => {
-    const options = {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-    };
-
-    try{
-        const res = await fetch(url, options);
-        const data = await res.json();
-        return data;
-    } catch (error) {
-        console.log(error)
-
-    }
-}
+import { differenceInDays } from "date-fns"; // Import this function
+import getStripe from "@/lib/get-stripejs";
+import axios from "axios";
 
 const Reservation = ({
     reservations,
@@ -46,7 +30,7 @@ const Reservation = ({
     isUserAuthenticated: boolean;
     userData: any;
 }) => {
-    //console.log(room)
+
 
     const [checkInDate, setCheckInDate] = React.useState<Date>()
     const [checkOutDate, setCheckOutDate] = React.useState<Date>()
@@ -69,91 +53,103 @@ const Reservation = ({
         return () => clearTimeout(timer);
     }, [alertMessage]);
 
-    const saveReservation = () => {
-        if(!checkInDate || !checkOutDate) {
-            return setAlertMessage({
+    // Helper function to check if a date is reserved
+    const isDateReserved = (date: Date) => {
+        const roomReservations = room.data.attributes.reservations.data;
+
+        return roomReservations.some((item: any) => {
+            const existingCheckOut = addDays(new Date(item.attributes.checkOut).setHours(0, 0, 0, 0), -1);
+            const existingCheckIn = addDays(new Date(item.attributes.checkIn).setHours(0, 0, 0, 0), +1);
+            return isWithinInterval(date, { start: existingCheckIn, end: existingCheckOut });
+        });
+    };
+
+    const days = checkInDate && checkOutDate ? differenceInDays(checkOutDate, checkInDate) : 0;
+    const totalPrice = Math.max(0, room.data.attributes.price * days);
+
+
+    const handleBookNowClick = async () => {
+
+        if (!checkInDate || !checkOutDate) {
+            setAlertMessage({
                 message: "Please select check-in and check-out dates",
                 type: 'error'
-            })
+            });
+            return false;
         }
 
-        if(checkInDate.getTime() === checkOutDate.getTime()) {
-            return setAlertMessage({
+        if (checkInDate.getTime() === checkOutDate.getTime()) {
+            setAlertMessage({
                 message: 'Check-In and Check-out dates cannot be the same',
                 type: 'error'
-            })
+            });
+            return false;
         }
 
         if (checkOutDate.getTime() < checkInDate.getTime()) {
-            return setAlertMessage({
+            setAlertMessage({
                 message: 'Check-Out date cannot be before Check-In date',
                 type: 'error',
             });
+            return false;
         }
+        const roomReservations = room.data.attributes.reservations.data;
+        const isReserved = roomReservations.some((item: any) => {
+            const existingCheckIn = new Date(item.attributes.checkIn).setHours(0, 0, 0, 0);
+            const existingCheckOut = new Date(item.attributes.checkOut).setHours(0, 0, 0, 0);
 
-        // filter reservations for the current room and check if any reservations overlaps with the selected dates
-        const isReserved = reservations.data.filter(
-            (item: any) => item.attributes.room.data.id === room.data.id
-            // filter reservations for the current room
-        ).some((item:any) => {
-            // check if any reservations overlaps with the selected dates
-            const existingCheckIn = new Date(item.attributes.checkIn).setHours(
-                0,
-                 0,
-                 0,
-                 0
-            ); // convert existing check-in date to midnight
-            const existingCheckOut = new Date(item.attributes.checkOut).setHours(
-                0,
-                0,
-                0,
-                0
-            ); // convert existing check-out date to midnight
+            const checkInTime = checkInDate?.setHours(0, 0, 0, 0);
+            const checkOutTime = checkOutDate?.setHours(0, 0, 0, 0);
 
-            // convert selected check-in date to midnight
-            const checkInTime = checkInDate?.setHours(0,0,0,0);
-            const checkOutTime = checkOutDate?.setHours(0,0,0,0);
-
-            // check if the room is reserved between the check in and check out dates
-            const isReservedBetweenDates =
-            (checkInTime >= existingCheckIn && checkInTime < existingCheckOut)
-            || (checkOutTime > existingCheckIn && checkOutTime <= existingCheckOut)
-            || (existingCheckIn > checkInTime && existingCheckIn < checkOutTime)
-            || (existingCheckOut > checkInTime && existingCheckOut <= checkOutTime);
-
-            return isReservedBetweenDates; // return true if any reservation overlaps with the selected dates.
+            return (checkInTime >= existingCheckIn && checkInTime < existingCheckOut)
+                || (checkOutTime > existingCheckIn && checkOutTime <= existingCheckOut)
+                || (existingCheckIn > checkInTime && existingCheckIn < checkOutTime)
+                || (existingCheckOut > checkInTime && existingCheckOut <= checkOutTime);
         });
 
-        // if the room is reserved log a message; otherwise proceed with booking
-
-        if(isReserved) {
+        if (isReserved) {
             setAlertMessage({
                 message: 'This room is already booked for the selected dates. Please choose different dates or another room',
                 type: 'error'
-            })
-        } else {
-            const data = {
-                data: {
-                    firstname: userData.family_name,
-                    lastname: userData.given_name,
-                    email: userData.email,
-                    checkIn: checkInDate ? formatDateForStrapi(checkInDate) : null, // format selected check in date
-                    checkOut: checkOutDate ? formatDateForStrapi(checkOutDate) : null, // format selected check in date
-                    room: room.data.id
-                },
-            };
-
-            // post booking data to the server
-            postData('http://127.0.0.1:1337/api/reservations', data)
-            setAlertMessage({
-                message: 'Your booking has been successfully confirmed',
-                type: 'success'
-            })
-            // refresh the page to reflect the updated reservation status
-            router.refresh();
+            });
+            return false;
         }
 
-    };
+
+        // PROCEED TO CHECKOUT
+        const stripe = await getStripe();
+
+        try {
+            const { data: stripeSession } = await axios.post("/api/stripe", {
+                totalPrice,
+                room,
+                firstname: userData.family_name,
+                lastname: userData.given_name,
+                email: userData.email,
+                checkIn: checkInDate ? formatDateForStrapi(checkInDate) : null,
+                checkOut: checkOutDate ? formatDateForStrapi(checkOutDate) : null,
+            });
+
+            if (stripe) {
+                const result = await stripe.redirectToCheckout({
+                    sessionId: stripeSession.id,
+                });
+
+                if (result.error) {
+                    console.log("error: " + result.error)
+
+                    setAlertMessage({
+                        message: 'Error OC',
+                        type: 'error'
+                    });
+                    return false;
+                }
+            }
+        } catch (error) {
+            console.log("Error: ", error);
+            router.push('/dashboard');
+        }
+    }
 
     return (
         <div>
@@ -167,6 +163,8 @@ const Reservation = ({
                 </div>
                 <div className={"flex flex-col gap-4 w-full py-6 px-8"}>
                     {/*Check In*/}
+
+
                     <Popover>
                         <PopoverTrigger asChild>
                             <Button
@@ -187,7 +185,7 @@ const Reservation = ({
                                 selected={checkInDate}
                                 onSelect={setCheckInDate}
                                 initialFocus
-                                disabled={isPast}
+                                disabled={date => isPast(date) || isDateReserved(date)}
                             />
                         </PopoverContent>
                     </Popover>
@@ -212,7 +210,7 @@ const Reservation = ({
                                 selected={checkOutDate}
                                 onSelect={setCheckOutDate}
                                 initialFocus
-                                disabled={isPast}
+                                disabled={date => isPast(date) || isDateReserved(date)}
                             />
                         </PopoverContent>
                     </Popover>
@@ -222,9 +220,11 @@ const Reservation = ({
                         if the user is not authenticated display a "Book now" button wrapped inside a login link.
                     */}
                     {isUserAuthenticated ? (
-                            <Button onClick={() => saveReservation()} size={"md"}>
-                                Book now
+
+                            <Button  onClick={handleBookNowClick} size={"md"}>
+                                Total Price {totalPrice} €
                             </Button>
+
                         )
                         : (
                             <LoginLink>
