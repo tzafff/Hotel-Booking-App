@@ -75,7 +75,10 @@ const RoomList = ({rooms}: { rooms: any }) => {
             {/* rooms list */}
             <div className={"grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"}>
                 {filteredRooms.map((room) => {
-                    const imgUrl = `http://127.0.0.1:1337${room.attributes.image.data?.attributes.url}`;
+                    //const imgUrl = `http://127.0.0.1:1337${room.attributes.image.data?.attributes.url}`;
+                    const firstImage = room.attributes.image.data?.[0];
+                    const imgUrl = `http://127.0.0.1:1337${firstImage.attributes.url}`
+
                     return (
                         <div key={room.id}>
                             <Link href={`/room/${room.id}`}>

@@ -43,7 +43,9 @@ export async function POST(req: Request, res: Response) {
     }
 
     try {
-        const imageUrl = `${origin}${room.data.attributes.image.data?.attributes.url}`;
+        const imageUrl = `https://blush-fundamental-gerbil-302.mypinata.cloud/ipfs/QmSMyR7Vghinqei8agWQ9kgZtoyxZ9GChaGxzDzGU6Mr18`;
+        console.log(imageUrl)
+
 
         // Create a stripe payment
         const stripeSession = await stripe.checkout.sessions.create({

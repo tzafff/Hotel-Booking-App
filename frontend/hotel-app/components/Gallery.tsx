@@ -3,8 +3,7 @@ import { FC, useCallback, useEffect, useRef, useState } from 'react';
 import '../styles/gallery-styles.css';
 import LightGallery from 'lightgallery/react';
 
-
-const Gallery = ({imgURL} : {imgURL: any}) => {
+const Gallery = ({ imgURLs } : { imgURLs: string[] }) => {
 
     const containerRef = useRef(null);
     const [galleryContainer, setGalleryContainer] = useState(null);
@@ -21,7 +20,12 @@ const Gallery = ({imgURL} : {imgURL: any}) => {
             setGalleryContainer('aaa');
         }
     }, []);
-    console.log(containerRef.current);
+
+    // Prepare dynamic elements for LightGallery
+    const dynamicEl = imgURLs.map((url) => ({
+        src: url,
+    }));
+
     return (
         <div className="App">
             <div
@@ -42,21 +46,7 @@ const Gallery = ({imgURL} : {imgURL: any}) => {
                     thumbMargin={6}
                     appendSubHtmlTo={'.lg-item'}
                     dynamic={true}
-                    dynamicEl={[
-                        {
-                            src: imgURL,
-                        },
-                        {
-                            src: imgURL,
-                        },
-                        {
-                            src: imgURL,
-                        },
-                        {
-                            src: imgURL,
-                        },
-
-                    ]}
+                    dynamicEl={dynamicEl}
                     hash={false}
                     elementClassNames={'inline-gallery-container'}
                 ></LightGallery>
@@ -64,4 +54,5 @@ const Gallery = ({imgURL} : {imgURL: any}) => {
         </div>
     );
 };
-export default Gallery
+
+export default Gallery;

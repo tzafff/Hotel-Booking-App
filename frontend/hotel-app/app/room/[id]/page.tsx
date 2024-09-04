@@ -25,7 +25,12 @@ const getReservationData = async () => {
 const RoomDetails = async ({params} : {params: any}) => {
     const room = await getRoomData({params});
     const reservations = await getReservationData();
-    const imgURL = `http://127.0.0.1:1337${room.data.attributes.image.data.attributes.url}`
+
+    // Extract image URLs
+    const imgURLs = room.data.attributes.image.data.map((img: any) => {
+        return `http://127.0.0.1:1337${img.attributes.url}`;
+    });
+
     const {isAuthenticated, getUser} = getKindeServerSession();
     const isUserAuthenticated = await isAuthenticated();
     const userData = await getUser();
@@ -40,7 +45,7 @@ const RoomDetails = async ({params} : {params: any}) => {
                         {/*    image    */}
                         <div className={"relative h-[360px] lg:h-[420px] mb-8"}>
                             {/*<Image src={imgURL} alt={""} fill className={"object-cover"}/>*/}
-                            <Gallery imgURL={imgURL}/>
+                            <Gallery imgURLs={imgURLs}/>
                         </div>
                         <div className={"flex flex-1 flex-col mb-8"}>
                             {/*    title & price    */}
