@@ -1,0 +1,181 @@
+@import url('https://cdn.jsdelivr.net/npm/lightgallery@2.4.0/css/lightgallery.css');
+@import url('https://cdn.jsdelivr.net/npm/lightgallery@2.4.0/css/lg-zoom.css');
+@import url('https://cdn.jsdelivr.net/npm/lightgallery@2.4.0/css/lg-share.css');
+@import url('https://cdn.jsdelivr.net/npm/lightgallery@2.4.0/css/lg-video.css');
+@import url('https://cdn.jsdelivr.net/npm/lightgallery@2.4.0/css/lg-thumbnail.css');
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: system-ui, sans-serif;
+    padding: 40px;
+    background-image: linear-gradient(#e8f0ff 0%, white 52.08%);
+    color: #0e3481;
+    min-height: 100vh;
+}
+
+.header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+
+.header__title {
+    font-size: 1.5rem;
+    margin-top: 1rem;
+    margin-bottom: 0;
+}
+
+.header__description {
+    font-size: 1.25rem;
+    padding-top: 1rem;
+    max-width: 620px;
+    margin: 0 auto;
+}
+.header__description2 {
+    font-size: 1.25rem;
+    margin-bottom: 2rem;
+    max-width: 620px;
+    margin: 0 auto;
+    margin-top: 10px;
+}
+
+.header__button {
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    border-radius: 0.25rem;
+    color: #007bff;
+    background-color: transparent;
+    border: 1px solid #007bff;
+    text-decoration: none;
+    margin-bottom: 3rem;
+    margin-top: 2rem;
+}
+
+.header__button:hover {
+    color: #0056b3;
+    background-color: transparent;
+    border-color: #0056b3;
+}
+
+.gallery {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.gallery__item {
+    width: 240px;
+    margin: 5px;
+}
+
+.gallery__item img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Custom styles for LightGallery */
+/* Make sure the gallery container has a transparent background */
+.inline-gallery-container {
+    width: 700px;
+    height: 500px;
+    position: relative;
+    overflow: hidden; /* Ensure that images that overflow are hidden */
+    background: transparent !important; /* Ensure the background is transparent */
+}
+
+/* Ensure the gallery items also have transparent background */
+.inline-gallery-container .lg-item {
+    background: transparent !important; /* Ensure the background is transparent */
+}
+
+/* Custom styles for LightGallery to ensure transparency */
+.lg-backdrop {
+    background: transparent !important; /* Make the backdrop transparent */
+}
+
+.lg-dialog {
+    background: transparent !important; /* Make the dialog background transparent */
+}
+
+/* Hide the black overlay */
+.lg-overlay {
+    background: transparent !important; /* Make the overlay background transparent */
+}
+
+/* Make sure the toolbar background is transparent */
+.lg-toolbar {
+    background: transparent !important; /* Make the toolbar background transparent */
+}
+
+/* Hide download icon if it's still visible */
+.lg-toolbar .lg-download {
+    display: none;
+}
+
+.lg-prev, .lg-next {
+    background-color: #e85f4c !important; /* Set background color to red */
+    border-radius: 50% !important; /* Make buttons circular */
+    width: 40px !important; /* Set button width */
+    height: 40px !important; /* Set button height */
+    color: white !important; /* Set button icon color to white */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important; /* Optional: add shadow for better visibility */
+}
+
+/* Ensure the icon color is white */
+.lg-prev:before, .lg-next:before {
+    color: white !important; /* Ensure the icon color is white */
+}
+
+/* Optional: Change the hover state of the buttons */
+.lg-prev:hover, .lg-next:hover {
+    background-color: #ea6f5e !important; /* Darker red for hover effect */
+    color: white !important; /* Ensure icon color stays white */
+}
+
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .inline-gallery-container {
+        width: 100% !important; /* Make gallery container full width */
+        height: auto !important; /* Adjust height automatically */
+    }
+
+    .gallery__item {
+        width: 100% !important; /* Make gallery items full width */
+        margin: 0 !important; /* Remove margin */
+    }
+
+    .lg-prev, .lg-next {
+        width: 35px !important; /* Reduce button width */
+        height: 35px !important; /* Reduce button height */
+    }
+}
+
+
+
+@media (max-width: 480px) {
+    .inline-gallery-container {
+        padding: 0 !important; /* Remove padding */
+    }
+
+    .gallery__item {
+        width: 100% !important; /* Make gallery items full width */
+        margin: 0 !important; /* Remove margin */
+    }
+
+    .lg-prev, .lg-next {
+        width: 30px !important; /* Further reduce button width */
+        height: 30px !important; /* Further reduce button height */
+    }
+
+    .lg-prev:before, .lg-next:before {
+        font-size: 18px !important; /* Adjust icon size for smaller screens */
+    }
+}

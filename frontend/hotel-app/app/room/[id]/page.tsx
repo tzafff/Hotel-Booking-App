@@ -2,6 +2,7 @@ import Image from 'next/image'
 import {TbArrowsMaximize, TbUsers} from "react-icons/tb";
 import Reservation from "@/components/Reservation";
 import {getKindeServerSession} from "@kinde-oss/kinde-auth-nextjs/server";
+import Gallery from "@/components/Gallery";
 const getRoomData = async ({params} : {params: any}) => {
     const res = await fetch(`http://127.0.0.1:1337/api/rooms/${params.id}?populate=*`,
         {
@@ -38,7 +39,8 @@ const RoomDetails = async ({params} : {params: any}) => {
                     <div className={"flex-1"}>
                         {/*    image    */}
                         <div className={"relative h-[360px] lg:h-[420px] mb-8"}>
-                            <Image src={imgURL} alt={""} fill className={"object-cover"}/>
+                            {/*<Image src={imgURL} alt={""} fill className={"object-cover"}/>*/}
+                            <Gallery imgURL={imgURL}/>
                         </div>
                         <div className={"flex flex-1 flex-col mb-8"}>
                             {/*    title & price    */}
