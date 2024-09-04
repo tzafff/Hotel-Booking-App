@@ -6,7 +6,7 @@ import { getKindeServerSession } from '@kinde-oss/kinde-auth-nextjs/server';
 
 
 const stripe = new Stripe(process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY as string, {
-    apiVersion: '2023-08-16',
+    apiVersion: "2024-06-20",
 });
 
 type RequestData = {

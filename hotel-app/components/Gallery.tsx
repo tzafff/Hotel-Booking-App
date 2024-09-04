@@ -3,14 +3,20 @@ import { FC, useCallback, useEffect, useRef, useState } from 'react';
 import '../styles/gallery-styles.css';
 import LightGallery from 'lightgallery/react';
 
+interface LightGalleryDetail {
+    instance: {
+        openGallery: () => void;
+    };
+}
+
 const Gallery = ({ imgURLs } : { imgURLs: string[] }) => {
 
-    const containerRef = useRef(null);
-    const [galleryContainer, setGalleryContainer] = useState(null);
+    const containerRef = useRef<HTMLDivElement | null>(null);
 
-    const onInit = useCallback((detail) => {
+    const [galleryContainer, setGalleryContainer] = useState<string | null>(null);
+
+    const onInit = useCallback((detail: LightGalleryDetail) => {
         if (detail) {
-            // lightGalleryRef.current = detail.instance;
             detail.instance.openGallery();
         }
     }, []);
@@ -35,21 +41,23 @@ const Gallery = ({ imgURLs } : { imgURLs: string[] }) => {
                 ref={containerRef}
             ></div>
             <div>
-                <LightGallery
-                    container={containerRef.current}
-                    onInit={onInit}
-                    closable={false}
-                    showMaximizeIcon={false}
-                    slideDelay={400}
-                    thumbWidth={130}
-                    thumbHeight={'100px'}
-                    thumbMargin={6}
-                    appendSubHtmlTo={'.lg-item'}
-                    dynamic={true}
-                    dynamicEl={dynamicEl}
-                    hash={false}
-                    elementClassNames={'inline-gallery-container'}
-                ></LightGallery>
+                {containerRef.current && (
+                    <LightGallery
+                        container={containerRef.current}
+                        onInit={onInit}
+                        closable={false}
+                        showMaximizeIcon={false}
+                        slideDelay={400}
+                        thumbWidth={130}
+                        thumbHeight={'100px'}
+                        thumbMargin={6}
+                        appendSubHtmlTo={'.lg-item'}
+                        dynamic={true}
+                        dynamicEl={dynamicEl}
+                        hash={false}
+                        elementClassNames={'inline-gallery-container'}
+                    ></LightGallery>
+                )}
             </div>
         </div>
     );

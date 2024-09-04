@@ -4,8 +4,19 @@ import Stripe from 'stripe';
 const checkout_session_completed = 'checkout.session.completed';
 
 const stripe = new Stripe(process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY as string, {
-    apiVersion: '2023-08-16',
+    apiVersion: "2024-06-20",
 });
+
+// Define a custom interface for the metadata if needed
+interface SessionMetadata {
+    totalPrice: number;
+    roomId: string;
+    firstname: string;
+    lastname: string;
+    email: string;
+    checkIn: string;
+    checkOut: string;
+}
 
 export async function POST(req: Request, res: Response) {
     const reqBody = await req.text();
@@ -21,24 +32,25 @@ export async function POST(req: Request, res: Response) {
         return new NextResponse(`Webhook Error: ${error.message}`, { status: 500 });
     }
 
-    // load our event
+    // Load our event
     switch (event.type) {
         case checkout_session_completed:
-            const session = event.data.object;
-            console.log("session")
-            console.log(session)
+            // Explicitly cast session to Stripe.Checkout.Session
+            const session = event.data.object as Stripe.Checkout.Session;
+
+            // Cast metadata to our custom interface
+            const metadata = session.metadata as unknown as SessionMetadata;
+
+            // Access the properties safely
             const {
-                // @ts-ignore
-                metadata: {
-                    totalPrice,
-                    roomId,
-                    firstname,
-                    lastname,
-                    email,
-                    checkIn,
-                    checkOut,
-                },
-            } = session;
+                totalPrice,
+                roomId,
+                firstname,
+                lastname,
+                email,
+                checkIn,
+                checkOut,
+            } = metadata;
 
             const data = {
                 data: {
@@ -50,11 +62,11 @@ export async function POST(req: Request, res: Response) {
                     room: roomId
                 },
             };
+
             console.log("DATA");
             console.log(data);
 
-
-            postData('http://127.0.0.1:1337/api/reservations', data)
+            await postData('http://127.0.0.1:1337/api/reservations', data);
 
             return NextResponse.json('Booking successful', {
                 status: 200,
@@ -71,7 +83,6 @@ export async function POST(req: Request, res: Response) {
     });
 }
 
-
 const postData = async (url: string, data: object) => {
     const options = {
         method: 'POST',
@@ -81,12 +92,11 @@ const postData = async (url: string, data: object) => {
         body: JSON.stringify(data),
     };
 
-    try{
+    try {
         const res = await fetch(url, options);
         const data = await res.json();
         return data;
     } catch (error) {
-        console.log(error)
-
+        console.log(error);
     }
 }
