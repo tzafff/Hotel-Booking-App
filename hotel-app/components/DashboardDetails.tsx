@@ -4,24 +4,30 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { format } from 'date-fns';
 import { getBookingsByEmail } from '@/lib/apis';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 const DashboardDetails = ({ userEmail }: { userEmail: string }) => {
     const [bookings, setBookings] = useState<any[]>([]);
+    const [loading, setLoading] = useState<boolean>(true); // Add loading state
 
     useEffect(() => {
         const fetchBookings = async () => {
             try {
+                setLoading(true); // Start loading
                 const fetchedBookings = await getBookingsByEmail(userEmail);
                 setBookings(fetchedBookings);
             } catch (error) {
                 console.error('Error fetching checkin/checkout dates', error);
+            } finally {
+                setLoading(false); // Stop loading after fetching data
             }
         };
 
         fetchBookings();
     }, [userEmail]);
 
+    if (loading) return <LoadingSpinner />; // Show spinner while loading
     return (
         <section className={'min-h-[80vh]'}>
             <div className={'container mx-auto py-8 h-full'}>
