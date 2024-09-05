@@ -1,17 +1,21 @@
+'use client';
 import RoomList from "@/components/RoomList";
+import useSWR from 'swr';
+import { getRooms } from '@/lib/apis';
+import {Room} from "@/models/room";
+import LoadingSpinner from "@/components/LoadingSpinner";
+import React from "react";
 
-const getRooms = async () => {
-    const res = await fetch(`http://127.0.0.1:1337/api/rooms?populate=*`, {
-        next:{
-            revalidate: 0,
-        },
-    });
-    return await res.json();
-}
+const Rooms = () => {
 
-const Rooms = async  () => {
-    const rooms = await getRooms();
-    // console.log(rooms)
+    async function fetchData() {
+        return getRooms();
+    }
+
+    const { data: rooms, error, isValidating } = useSWR<Room[]>('get/hotelRooms', fetchData);
+
+    if (isValidating) return <LoadingSpinner />;
+    if (error) return <p>Error loading room details.</p>;
 
     return (
         <section>

@@ -32,7 +32,8 @@ export async function POST(req: Request, res: Response) {
     debugger
 
 
-    const roomId = room.data.id;
+    const roomId = room._id;
+
     const origin = req.headers.get('origin');
 
     const {getUser} = getKindeServerSession();
@@ -44,7 +45,6 @@ export async function POST(req: Request, res: Response) {
 
     try {
         const imageUrl = `https://blush-fundamental-gerbil-302.mypinata.cloud/ipfs/QmSMyR7Vghinqei8agWQ9kgZtoyxZ9GChaGxzDzGU6Mr18`;
-        console.log(imageUrl)
 
 
         // Create a stripe payment
@@ -56,7 +56,7 @@ export async function POST(req: Request, res: Response) {
                     price_data: {
                         currency: 'eur',
                         product_data: {
-                            name: room.data.attributes.title,
+                            name: room.name,
                             images: [imageUrl],
                         },
                         unit_amount: parseInt((totalPrice * 100).toString()),

@@ -4,6 +4,9 @@ const nextConfig = {
         remotePatterns: [
             {
                 hostname: '127.0.0.1',
+            },
+            {
+                hostname: 'blush-fundamental-gerbil-302.mypinata.cloud',
             }
         ]
     }

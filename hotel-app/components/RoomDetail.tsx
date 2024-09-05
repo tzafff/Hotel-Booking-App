@@ -1,39 +1,51 @@
-import Image from 'next/image'
+"use client"
+import React, {useEffect, useState} from 'react'
+import useSWR from 'swr';
+import {getAllBookings, getRoom} from "@/lib/apis";
 import {TbArrowsMaximize, TbUsers} from "react-icons/tb";
-import Reservation from "@/components/Reservation";
-import {getKindeServerSession} from "@kinde-oss/kinde-auth-nextjs/server";
 import Gallery from "@/components/Gallery";
-const getRoomData = async ({params} : {params: any}) => {
-    const res = await fetch(`http://127.0.0.1:1337/api/rooms/${params.id}?populate=*`,
-        {
-            next: {
-                revalidate: 0,
-            },
-        });
-    return await res.json();
-};
+import Reservation from "@/components/Reservation";
+import Image from 'next/image'
+import LoadingSpinner from "@/components/LoadingSpinner";
+const RoomDetail = ({roomId, isUserAuthenticated, userData}: {roomId: any; isUserAuthenticated: any; userData:any}) => {
 
-const getReservationData = async () => {
-    const res = await fetch(`http://127.0.0.1:1337/api/reservations?populate=*`, {
-        next: {
-            revalidate: 0,
-        },
-    });
-    return await res.json();
-}
+    const [checkinCheckoutDates, setCheckinCheckoutDates] = useState<
+        { checkinDate: string; checkoutDate: string }[]
+    >([]);
 
-const RoomDetails = async ({params} : {params: any}) => {
-    const room = await getRoomData({params});
-    const reservations = await getReservationData();
+    const fetchRoom = async () => getRoom(roomId);
+    const { data: room, error, isLoading } = useSWR("/api/room", fetchRoom);
 
-    // Extract image URLs
-    const imgURLs = room.data.attributes.image.data.map((img: any) => {
-        return `http://127.0.0.1:1337${img.attributes.url}`;
-    });
+    useEffect(() => {
+        if (!room) return; // You can handle this case here or move it outside the useEffect
 
-    const {isAuthenticated, getUser} = getKindeServerSession();
-    const isUserAuthenticated = await isAuthenticated();
-    const userData = await getUser();
+        const fetchCheckinCheckoutDates = async () => {
+            try {
+                //console.log(room.name)
+                const { name } = room;
+                const bookings = await getAllBookings(name);
+                // console.log(bookings)
+                const dates = bookings.map((booking: any) => ({
+                    checkinDate: booking?.checkinDate,  // Adjust to actual structure
+                    checkoutDate: booking?.checkoutDate, // Adjust to actual structure
+                }));
+                setCheckinCheckoutDates(dates)
+
+            } catch (error) {
+                console.error("Error fetching checkin/checkout dates", error);
+            }
+        };
+
+        fetchCheckinCheckoutDates();
+    }, [room]);
+
+    const imgURLs = room?.images?.map((image: { url: string }) => image.url) || [];
+
+    if (isLoading) return <LoadingSpinner />;
+    if (error) return <p>Error loading room details.</p>;
+    if (!room) return <p>No room data available.</p>;
+    const { name, price, dimension, description } = room;
+
 
 
     return (
@@ -44,15 +56,14 @@ const RoomDetails = async ({params} : {params: any}) => {
                     <div className={"flex-1"}>
                         {/*    image    */}
                         <div className={"relative h-[360px] lg:h-[420px] mb-8"}>
-                            {/*<Image src={imgURL} alt={""} fill className={"object-cover"}/>*/}
                             <Gallery imgURLs={imgURLs}/>
                         </div>
                         <div className={"flex flex-1 flex-col mb-8"}>
                             {/*    title & price    */}
                             <div className={"flex justify-between items-center mb-4"}>
-                                <h3 className={"h3"}>{room.data.attributes.title}</h3>
+                                <h3 className={"h3"}>{name}</h3>
                                 <p className={"h3 font-secondary font-medium text-accent"}>
-                                    €{room.data.attributes.price}
+                                    €{price}
                                     <span className={"text-base text-secondary"}>/ night</span>
                                 </p>
                             </div>
@@ -63,7 +74,7 @@ const RoomDetails = async ({params} : {params: any}) => {
                                         <TbArrowsMaximize />
                                     </div>
                                     <p>
-                                        {room.data.attributes.size} m <sup>2</sup>
+                                        {dimension} m <sup>2</sup>
                                     </p>
                                 </div>
                                 <div className={"flex items-center gap-2 "}>
@@ -71,18 +82,18 @@ const RoomDetails = async ({params} : {params: any}) => {
                                         <TbUsers />
                                     </div>
                                     <p>
-                                        {room.data.attributes.capacity} Guests
+                                        {/*{room.data.attributes.capacity} Guests*/}
                                     </p>
                                 </div>
                             </div>
 
-                            <p>{room.data.attributes.description}</p>
+                            <p>{description}</p>
                         </div>
                     </div>
                     {/*    reservation   */}
                     <div className={"w-full lg:max-w-[360px] h-max"}>
                         <Reservation
-                            reservations={reservations}
+                            checkinCheckoutDates={checkinCheckoutDates}
                             room={room}
                             isUserAuthenticated={isUserAuthenticated}
                             userData={userData}
@@ -93,4 +104,4 @@ const RoomDetails = async ({params} : {params: any}) => {
         </section>
     )
 }
-export default RoomDetails
+export default RoomDetail

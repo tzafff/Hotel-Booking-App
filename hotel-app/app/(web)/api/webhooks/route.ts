@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
+import { createBooking } from "@/lib/apis";  // Ensure this path is correct
 
 const checkout_session_completed = 'checkout.session.completed';
 
@@ -7,7 +8,6 @@ const stripe = new Stripe(process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY as string, {
     apiVersion: "2024-06-20",
 });
 
-// Define a custom interface for the metadata if needed
 interface SessionMetadata {
     totalPrice: number;
     roomId: string;
@@ -32,16 +32,11 @@ export async function POST(req: Request, res: Response) {
         return new NextResponse(`Webhook Error: ${error.message}`, { status: 500 });
     }
 
-    // Load our event
     switch (event.type) {
         case checkout_session_completed:
-            // Explicitly cast session to Stripe.Checkout.Session
             const session = event.data.object as Stripe.Checkout.Session;
-
-            // Cast metadata to our custom interface
             const metadata = session.metadata as unknown as SessionMetadata;
 
-            // Access the properties safely
             const {
                 totalPrice,
                 roomId,
@@ -52,26 +47,21 @@ export async function POST(req: Request, res: Response) {
                 checkOut,
             } = metadata;
 
-            const data = {
-                data: {
-                    firstname: firstname,
-                    lastname: lastname,
-                    email: email,
-                    checkIn: checkIn,
-                    checkOut: checkOut,
-                    room: roomId
-                },
-            };
+            try {
+                await createBooking({
+                    checkinDate: checkIn,        // Corrected to match the function
+                    checkoutDate: checkOut,      // Corrected to match the function
+                    hotelRoom: roomId,           // Corrected to match the function
+                    email,                       // Already correct
+                });
 
-            console.log("DATA");
-            console.log(data);
-
-            await postData('http://127.0.0.1:1337/api/reservations', data);
-
-            return NextResponse.json('Booking successful', {
-                status: 200,
-                statusText: 'Booking Successful',
-            });
+                return NextResponse.json('Booking successful', {
+                    status: 200,
+                    statusText: 'Booking Successful',
+                });
+            } catch (error) {
+                return new NextResponse(`Error creating booking: ${error.message}`, { status: 500 });
+            }
 
         default:
             console.log(`Unhandled event type ${event.type}`);
@@ -81,22 +71,4 @@ export async function POST(req: Request, res: Response) {
         status: 200,
         statusText: 'Event Received',
     });
-}
-
-const postData = async (url: string, data: object) => {
-    const options = {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-    };
-
-    try {
-        const res = await fetch(url, options);
-        const data = await res.json();
-        return data;
-    } catch (error) {
-        console.log(error);
-    }
 }
