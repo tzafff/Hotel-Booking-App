@@ -60,32 +60,32 @@ const RoomList = ({rooms} : { rooms: Room[] }) => {
                     </TabsTrigger>
                     <TabsTrigger
                         className={"w-full h-full"}
-                        value={'single'}
-                        onClick={() => setRoomType('single')}
+                        value={'luxury'}
+                        onClick={() => setRoomType('luxury')}
                     >
-                        Single
+                        Luxury
                     </TabsTrigger>
                     <TabsTrigger
                         className={"w-full h-full"}
-                        value={'double'}
-                        onClick={() => setRoomType('double')}
+                        value={'suite'}
+                        onClick={() => setRoomType('suite')}
                     >
-                        Double
+                        Suite
                     </TabsTrigger>
-                    <TabsTrigger
-                        className={"w-full h-full"}
-                        value={'extended'}
-                        onClick={() => setRoomType('extended')}
-                    >
-                        Extended
-                    </TabsTrigger>
+                    {/*<TabsTrigger*/}
+                    {/*    className={"w-full h-full"}*/}
+                    {/*    value={'extended'}*/}
+                    {/*    onClick={() => setRoomType('extended')}*/}
+                    {/*>*/}
+                    {/*    Extended*/}
+                    {/*</TabsTrigger>*/}
                 </TabsList>
             </Tabs>
 
             {/* rooms list */}
             <div className={"grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"}>
                 {filteredRooms.map((room) => {
-                    const imgUrl = room.coverImage.url;
+                    const imgUrl = room?.coverImage.url;
 
                     return (
                         <div key={room.id}>
