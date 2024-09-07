@@ -36,4 +36,7 @@ export type CreateBookingDto = {
     checkinDate: string;
     checkoutDate: string;
     email: string;
+    totalPrice: number;
+    given_name: string;
+    family_name: string;
 };
