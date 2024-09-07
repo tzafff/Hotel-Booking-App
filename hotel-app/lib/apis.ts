@@ -42,7 +42,7 @@ export async function getAllBookings(roomName: string) {
 
 export async function getBookingsByEmail(email: string) {
     const result = await sanityClient.fetch<typeof Booking[]>(
-        queries.getBookings ByEmailQuery,
+        queries.getBookingsByEmailQuery,
         {
             email,
         },
