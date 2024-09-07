@@ -82,7 +82,7 @@ const RoomDetail = ({roomId, isUserAuthenticated, userData}: {roomId: any; isUse
                                         <TbUsers />
                                     </div>
                                     <p>
-                                        {/*{room.data.attributes.capacity} Guests*/}
+                                        {room.persons} Guests
                                     </p>
                                 </div>
                             </div>

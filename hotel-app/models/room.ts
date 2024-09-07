@@ -28,6 +28,7 @@ export type Room = {
     price: number;
     slug: Slug;
     type: string;
+    persons: string
 };
 
 export type CreateBookingDto = {

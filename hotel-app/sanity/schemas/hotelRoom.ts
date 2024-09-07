@@ -89,6 +89,11 @@ const hotelRoom = {
             title: 'Dimension',
             type: 'string',
         }),
+        defineField({
+            name: 'persons',
+            type: 'string',
+            title: 'Number of Persons',
+        }),
     ],
 };
 

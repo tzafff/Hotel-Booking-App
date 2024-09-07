@@ -26,6 +26,7 @@ const DashboardDetails = ({ userEmail }: { userEmail: string }) => {
 
         fetchBookings();
     }, [userEmail]);
+    console.log(bookings)
 
     if (loading) return <LoadingSpinner />; // Show spinner while loading
     return (
@@ -74,6 +75,7 @@ const DashboardDetails = ({ userEmail }: { userEmail: string }) => {
                         </span>
                                             </div>
                                         </div>
+                                        Total Price: {reservation.totalPrice}
                                         {/* <CancelReservation reservation={reservation} /> */}
                                     </div>
                                 </div>

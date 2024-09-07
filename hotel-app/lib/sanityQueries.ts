@@ -22,7 +22,8 @@ export const getRoom = groq`*[_type == "hotelRoom" && slug.current == $slug][0] 
     name,
     price,
     slug,
-    type
+    type,
+    persons
 }`;
 
 
@@ -46,7 +47,6 @@ export const getBookingsByEmailQuery = groq`*[_type == 'booking' && email == $em
     _id,
     checkinDate,
     checkoutDate,
-    numberOfDays,
     email,
     hotelRoom -> {
         _id,
@@ -54,4 +54,5 @@ export const getBookingsByEmailQuery = groq`*[_type == 'booking' && email == $em
         slug,
         price
     },
+    totalPrice
 }`;

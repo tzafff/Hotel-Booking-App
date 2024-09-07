@@ -1,5 +1,5 @@
 "use client"
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { FaStar, FaStarHalf } from "react-icons/fa";
@@ -102,7 +102,7 @@ const RoomList = ({rooms} : { rooms: Room[] }) => {
                             </Link>
                             <div className={"h-[134px]"}>
                                 <div className={"flex items-center justify-between mb-6"}>
-                                    <div>Capacity - {room.dimension} sqm</div>
+                                    <div>Dimension - {room.dimension} m <sup>2</sup></div>
                                     <div className={"flex gap-1 text-accent"}>
                                         <FaStar />
                                         <FaStar />
