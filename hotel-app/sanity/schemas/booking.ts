@@ -32,7 +32,7 @@ const booking = {
         defineField({
             name: 'totalPrice',
             title: 'Total Price',
-            type: 'number',
+            type: 'string',
             validation: Rule => Rule.required().min(0),
         }),
         defineField({
