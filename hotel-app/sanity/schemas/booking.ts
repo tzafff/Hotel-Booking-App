@@ -29,6 +29,22 @@ const booking = {
             type: 'string',
             title: 'Email',
         }),
+        defineField({
+            name: 'totalPrice',
+            title: 'Total Price',
+            type: 'string',
+            validation: Rule => Rule.required().min(0),
+        }),
+        defineField({
+            name: 'family_name',
+            type: 'string',
+            title: 'Family Name',
+        }),
+        defineField({
+            name: 'given_name',
+            type: 'string',
+            title: 'Given Name',
+        }),
     ],
 };
 

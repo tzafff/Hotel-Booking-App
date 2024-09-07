@@ -46,13 +46,18 @@ export async function POST(req: Request, res: Response) {
                 checkIn,
                 checkOut,
             } = metadata;
+            console.log(metadata)
 
             try {
                 await createBooking({
-                    checkinDate: checkIn,        // Corrected to match the function
-                    checkoutDate: checkOut,      // Corrected to match the function
-                    hotelRoom: roomId,           // Corrected to match the function
-                    email,                       // Already correct
+                    checkinDate: checkIn,
+                    checkoutDate: checkOut,
+                    hotelRoom: roomId,
+                    email,
+                    totalPrice: totalPrice,
+                    given_name: firstname,
+                    family_name: lastname
+
                 });
 
                 return NextResponse.json('Booking successful', {
